@@ -1,0 +1,714 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>skel — Mac dev environment, saved.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── TOKENS ── */
+    :root {
+      --sans: 'Geist', system-ui, sans-serif;
+      --mono: 'Geist Mono', monospace;
+      --radius: 6px;
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="light"] {
+      --bg:       #fafaf9;
+      --bg2:      #f3f2f0;
+      --bg3:      #eae9e6;
+      --surface:  #ffffff;
+      --border:   #e2e0db;
+      --border2:  #cccac4;
+      --ink:      #111110;
+      --ink2:     #3c3b38;
+      --muted:    #888580;
+      --subtle:   #b8b5af;
+      --accent:   #111110;
+      --tag-bg:   #eae9e6;
+      --tag-fg:   #888580;
+      --btn-bg:   #111110;
+      --btn-fg:   #fafaf9;
+      --code-bg:  #111110;
+      --code-fg:  #d4d0c8;
+      --code-prompt: #555250;
+      --ok:       #111110;
+      --scan-border: #eae9e6;
+    }
+
+    [data-theme="dark"] {
+      --bg:       #111110;
+      --bg2:      #191918;
+      --bg3:      #222220;
+      --surface:  #1c1c1a;
+      --border:   #2a2a28;
+      --border2:  #3a3a38;
+      --ink:      #f0ede8;
+      --ink2:     #c8c5be;
+      --muted:    #6b6865;
+      --subtle:   #444240;
+      --accent:   #f0ede8;
+      --tag-bg:   #222220;
+      --tag-fg:   #6b6865;
+      --btn-bg:   #f0ede8;
+      --btn-fg:   #111110;
+      --code-bg:  #0d0d0c;
+      --code-fg:  #c8c5be;
+      --code-prompt: #555250;
+      --ok:       #c8c5be;
+      --scan-border: #222220;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: color-mix(in srgb, var(--bg) 85%, transparent);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; color: var(--ink);
+      font-family: var(--mono); font-size: 14px; font-weight: 500;
+      letter-spacing: -0.01em;
+      transition: color var(--transition);
+    }
+
+    .logo-mark {
+      width: 20px; height: 20px;
+      border: 1.5px solid var(--ink);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      transition: border-color var(--transition), color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .nav-tag {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.06em;
+      background: var(--tag-bg); border: 1px solid var(--border);
+      padding: 2px 8px; border-radius: 3px;
+      transition: all var(--transition);
+    }
+
+    @media (max-width: 480px) { .nav-tag { display: none; } }
+
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+
+    .gh-btn {
+      display: flex; align-items: center; gap: 6px;
+      text-decoration: none; color: var(--muted);
+      font-family: var(--mono); font-size: 12px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 5px 12px;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .gh-btn:hover { color: var(--ink); border-color: var(--border2); }
+    .gh-btn svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+    .theme-btn {
+      width: 36px; height: 36px; border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .theme-btn:hover { color: var(--ink); border-color: var(--border2); }
+    .theme-btn svg { width: 14px; height: 14px; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 64px;
+      max-width: 1160px; margin: 0 auto;
+      padding: 100px 32px 80px;
+    }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 80px 24px 60px; min-height: auto; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 72px 20px 48px; gap: 32px; }
+    }
+
+    .hero-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 20px;
+      opacity: 0; animation: up 0.5s ease forwards 0.05s;
+    }
+    .kicker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--subtle); }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 60px);
+      font-weight: 500; letter-spacing: -0.03em; line-height: 1.08;
+      margin-bottom: 18px; color: var(--ink);
+      opacity: 0; animation: up 0.5s ease forwards 0.1s;
+      transition: color var(--transition);
+    }
+    @media (max-width: 480px) { h1 { font-size: 34px; } }
+
+    h1 .dim { color: var(--muted); font-weight: 300; }
+
+    .hero-desc {
+      font-size: 15px; color: var(--ink2); line-height: 1.75;
+      max-width: 420px; margin-bottom: 36px;
+      opacity: 0; animation: up 0.5s ease forwards 0.15s;
+      transition: color var(--transition);
+    }
+    @media (max-width: 480px) { .hero-desc { font-size: 14px; } }
+
+    .install-block {
+      opacity: 0; animation: up 0.5s ease forwards 0.2s;
+    }
+
+    .install-row {
+      display: flex; align-items: center; gap: 0;
+      background: var(--code-bg); border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 14px;
+      border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+      transition: background var(--transition);
+    }
+
+    .install-prefix {
+      padding: 12px 14px;
+      font-family: var(--mono); font-size: 12px;
+      color: var(--code-prompt);
+      border-right: 1px solid color-mix(in srgb, var(--border) 20%, transparent);
+      flex-shrink: 0;
+    }
+
+    .install-cmd-text {
+      flex: 1; padding: 12px 14px;
+      font-family: var(--mono); font-size: 13px;
+      color: var(--code-fg);
+    }
+
+    .copy-btn {
+      padding: 12px 14px; background: none; border: none;
+      border-left: 1px solid color-mix(in srgb, var(--border) 20%, transparent);
+      cursor: pointer; color: var(--code-prompt);
+      transition: color 0.15s; display: flex; align-items: center;
+      min-width: 44px; justify-content: center;
+    }
+    .copy-btn:hover { color: var(--code-fg); }
+    .copy-btn svg { width: 13px; height: 13px; }
+
+    .hero-sub-links {
+      display: flex; align-items: center; gap: 16px;
+      font-size: 13px; flex-wrap: wrap;
+    }
+
+    .hero-link {
+      color: var(--muted); text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+      transition: color var(--transition);
+      padding: 4px 0;
+    }
+    .hero-link:hover { color: var(--ink); }
+
+    .hero-link-sep { color: var(--subtle); }
+    @media (max-width: 380px) { .hero-link-sep { display: none; } }
+
+    /* ── TERMINAL CARD ── */
+    .term-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 8px 32px color-mix(in srgb, var(--ink) 6%, transparent);
+      opacity: 0; animation: up 0.5s ease forwards 0.2s;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .term-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .term-dots { display: flex; gap: 5px; }
+    .tdot { width: 10px; height: 10px; border-radius: 50%; }
+    .tdot-r { background: #ff5f57; } .tdot-y { background: #febc2e; } .tdot-g { background: #28c840; }
+
+    .term-title {
+      margin-left: 6px; font-family: var(--mono); font-size: 11px;
+      color: var(--muted); letter-spacing: 0.04em;
+    }
+
+    .term-body { padding: 18px 18px 22px; font-family: var(--mono); }
+
+    .t-cmd { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+    .t-prompt { color: var(--subtle); }
+
+    .t-line {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 5px 0; border-bottom: 1px solid var(--scan-border);
+      font-size: 12px; color: var(--ink2);
+      opacity: 0; animation: lineIn 0.25s ease forwards;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .t-line:last-of-type { border-bottom: none; }
+
+    .t-line:nth-child(1) { animation-delay: 0.5s; }
+    .t-line:nth-child(2) { animation-delay: 0.75s; }
+    .t-line:nth-child(3) { animation-delay: 1.0s; }
+    .t-line:nth-child(4) { animation-delay: 1.25s; }
+    .t-line:nth-child(5) { animation-delay: 1.5s; }
+    .t-line:nth-child(6) { animation-delay: 1.75s; }
+    .t-line:nth-child(7) { animation-delay: 2.0s; }
+
+    .t-ok { color: var(--ok); font-size: 11px; flex-shrink: 0; }
+    .t-label { flex: 1; min-width: 0; }
+    .t-count { color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+    @media (max-width: 480px) {
+      .t-count { display: none; }
+      .t-line { font-size: 12px; }
+    }
+
+    .t-summary {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px;
+      opacity: 0; animation: lineIn 0.25s ease forwards 2.25s;
+      transition: border-color var(--transition);
+    }
+
+    .t-summary-label { color: var(--muted); }
+    .t-summary-val { color: var(--ink); font-weight: 500; }
+
+    .cursor {
+      display: inline-block; width: 6px; height: 12px;
+      background: var(--ink); margin-left: 2px; vertical-align: middle;
+      animation: blink 1s step-end infinite;
+      transition: background var(--transition);
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      max-width: 1160px; margin: 0 auto; padding: 72px 32px;
+    }
+    @media (max-width: 768px) { .section { padding: 56px 24px; } }
+    @media (max-width: 480px) { .section { padding: 48px 20px; } }
+
+    .section-top {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 36px; gap: 24px;
+    }
+    @media (max-width: 700px) { .section-top { flex-direction: column; align-items: flex-start; margin-bottom: 28px; } }
+
+    .section-eyebrow {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+      transition: color var(--transition);
+    }
+
+    h2 {
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 500; letter-spacing: -0.025em; line-height: 1.15;
+      color: var(--ink); transition: color var(--transition);
+    }
+    h2 .dim { color: var(--muted); font-weight: 300; }
+
+    .section-note {
+      font-size: 13px; color: var(--muted); max-width: 280px; line-height: 1.7;
+      text-align: right; transition: color var(--transition); flex-shrink: 0;
+    }
+    @media (max-width: 700px) { .section-note { text-align: left; max-width: 100%; } }
+
+    .hr { height: 1px; background: var(--border); max-width: 1160px; margin: 0 auto; transition: background var(--transition); }
+
+    /* ── CMD TABLE ── */
+    .cmd-table { width: 100%; }
+
+    .cmd-row {
+      display: grid; grid-template-columns: 160px 1fr 72px;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+      gap: 20px; align-items: start;
+      transition: border-color var(--transition);
+    }
+    .cmd-row:first-child { border-top: 1px solid var(--border); }
+
+    @media (max-width: 640px) {
+      .cmd-row { grid-template-columns: 1fr; gap: 4px; padding: 14px 0; }
+      .cmd-tag { display: none; }
+    }
+
+    .cmd-name {
+      font-family: var(--mono); font-size: 13px; font-weight: 500;
+      color: var(--ink2); transition: color var(--transition);
+      padding-top: 1px;
+    }
+    .cmd-row:hover .cmd-name { color: var(--ink); }
+
+    .cmd-desc { font-size: 13px; color: var(--muted); line-height: 1.6; transition: color var(--transition); }
+
+    .cmd-tag {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--subtle);
+      text-align: right; transition: color var(--transition); padding-top: 2px;
+    }
+
+    /* ── COVERAGE GRID ── */
+    .cov-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+      transition: border-color var(--transition);
+    }
+    @media (max-width: 768px) { .cov-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 380px) { .cov-grid { grid-template-columns: 1fr; } }
+
+    .cov-cell {
+      padding: 20px 18px; border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition);
+      cursor: default;
+    }
+    .cov-cell:hover { background: var(--bg2); }
+    .cov-cell:nth-child(4n) { border-right: none; }
+    .cov-cell:nth-last-child(-n+4) { border-bottom: none; }
+
+    @media (max-width: 768px) {
+      .cov-cell:nth-child(4n) { border-right: 1px solid var(--border); }
+      .cov-cell:nth-child(2n) { border-right: none; }
+      .cov-cell:nth-last-child(-n+4) { border-bottom: 1px solid var(--border); }
+      .cov-cell:nth-last-child(-n+2) { border-bottom: none; }
+    }
+
+    @media (max-width: 380px) {
+      .cov-cell { border-right: none !important; }
+      .cov-cell:last-child { border-bottom: none; }
+      .cov-cell:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+    }
+
+    .cov-icon { font-size: 18px; margin-bottom: 8px; }
+    .cov-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; transition: color var(--transition); }
+    .cov-detail { font-size: 12px; color: var(--muted); line-height: 1.55; transition: color var(--transition); }
+
+    /* ── SHARE ── */
+    .share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .share-grid { grid-template-columns: 1fr; } }
+
+    .share-card {
+      border: 1px solid var(--border); border-radius: 8px; padding: 22px;
+      background: var(--bg2); transition: all var(--transition);
+    }
+    .share-card:hover { background: var(--bg3); border-color: var(--border2); }
+
+    .share-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+      transition: color var(--transition);
+    }
+    .share-cmd {
+      font-family: var(--mono); font-size: 13px; color: var(--ink);
+      margin-bottom: 10px; font-weight: 500; transition: color var(--transition);
+      word-break: break-all;
+    }
+    .share-desc { font-size: 13px; color: var(--muted); line-height: 1.65; transition: color var(--transition); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1160px; margin: 0 auto;
+      font-size: 12px; color: var(--muted);
+      transition: border-color var(--transition), color var(--transition);
+      flex-wrap: wrap; gap: 16px;
+    }
+    @media (max-width: 640px) {
+      footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+
+    .footer-logo {
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; color: var(--muted);
+      font-family: var(--mono); font-size: 12px; font-weight: 500;
+      transition: color var(--transition);
+    }
+    .footer-logo:hover { color: var(--ink); }
+
+    .footer-logo .logo-mark {
+      width: 16px; height: 16px; font-size: 9px;
+      border-color: var(--subtle);
+      transition: border-color var(--transition);
+    }
+
+    .footer-built {
+      font-family: var(--mono); font-size: 11px; color: var(--subtle);
+      transition: color var(--transition);
+    }
+    @media (max-width: 640px) { .footer-built { display: none; } }
+
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; transition: color var(--transition); padding: 2px 0; }
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.55s ease, transform 0.55s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes lineIn {
+      from { opacity: 0; transform: translateX(-3px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0; }
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-left">
+      <a href="#" class="nav-logo">
+        <div class="logo-mark">sk</div>
+        skel
+      </a>
+      <span class="nav-tag">v0.2.0 · early preview</span>
+    </div>
+    <div class="nav-right">
+      <a href="https://github.com/kasperbasse/skel" target="_blank" class="gh-btn">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span id="star-count">GitHub</span>
+      </a>
+      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle dark/light mode">
+        <svg id="theme-icon" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <p class="hero-kicker"><span class="kicker-dot"></span> Mac dev environment backup</p>
+      <h1>Your Mac setup.<br><span class="dim">Saved. Restored.</span><br>In minutes.</h1>
+      <p class="hero-desc">
+        skel scans your dev environment — packages, shell configs, editors, dotfiles, language versions — and saves it as a portable profile. Restore it on any Mac with a single command.
+      </p>
+      <div class="install-block">
+        <div class="install-row">
+          <span class="install-prefix">brew</span>
+          <span class="install-cmd-text">install skel</span>
+          <button class="copy-btn" onclick="copyInstall()" title="Copy">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/><path d="M2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H9v1H2V6h1V5z"/></svg>
+          </button>
+        </div>
+        <div class="hero-sub-links">
+          <a href="https://github.com/kasperbasse/skel" target="_blank" class="hero-link">
+            View on GitHub
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg>
+          </a>
+          <span class="hero-link-sep">·</span>
+          <a href="#commands" class="hero-link">Commands</a>
+          <span class="hero-link-sep">·</span>
+          <a href="#coverage" class="hero-link">Coverage</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMINAL -->
+    <div class="term-card">
+      <div class="term-bar">
+        <div class="term-dots">
+          <div class="tdot tdot-r"></div>
+          <div class="tdot tdot-y"></div>
+          <div class="tdot tdot-g"></div>
+        </div>
+        <span class="term-title">zsh — skel scan</span>
+      </div>
+      <div class="term-body">
+        <div class="t-cmd"><span class="t-prompt">~ $</span> skel scan work-2026</div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">Homebrew</span><span class="t-count">142 formulas · 38 casks</span></div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">Shell — zsh, Starship</span><span class="t-count">4 configs</span></div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">Editors — VS Code, Cursor</span><span class="t-count">2 editors</span></div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">Git — config + gitignore</span><span class="t-count">global</span></div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">Languages — node, go, python</span><span class="t-count">3 runtimes</span></div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">Configs — ~/.config</span><span class="t-count">14 files</span></div>
+        <div class="t-line"><span class="t-ok">✓</span><span class="t-label">System defaults</span><span class="t-count">dock · finder</span></div>
+        <div class="t-summary">
+          <span class="t-summary-label">→ Saved as work-2026</span>
+          <span class="t-summary-val">247 items<span class="cursor"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- COMMANDS -->
+  <section class="section reveal" id="commands">
+    <div class="section-top">
+      <div>
+        <p class="section-eyebrow">01 · Commands</p>
+        <h2>Everything you need.<br><span class="dim">Nothing you don't.</span></h2>
+      </div>
+      <p class="section-note">Full tab completion for profile names across all commands.</p>
+    </div>
+    <div class="cmd-table">
+      <div class="cmd-row"><div class="cmd-name">skel scan</div><div class="cmd-desc">Scan your Mac and save a profile. Captures packages, shell, editors, git, languages, configs, and system defaults.</div><div class="cmd-tag">capture</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel doctor</div><div class="cmd-desc">Pre-flight check before you restore. Shows exactly what's missing and how to fix it — nothing gets installed.</div><div class="cmd-tag">inspect</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel restore</div><div class="cmd-desc">Interactive section picker. Skips what's already installed. Supports --dry-run and --only flags.</div><div class="cmd-tag">restore</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel drift</div><div class="cmd-desc">See what's changed on your Mac since the last scan — new tools, removed packages, config changes.</div><div class="cmd-tag">inspect</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel diff</div><div class="cmd-desc">Compare two profiles side-by-side. Useful for tracking differences between machines or environments.</div><div class="cmd-tag">inspect</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel publish</div><div class="cmd-desc">Publish your profile as a GitHub Gist. Git name, email, hostname, and SSH key comments are auto-redacted.</div><div class="cmd-tag">share</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel clone</div><div class="cmd-desc">Clone a profile from a public GitHub Gist. No auth required.</div><div class="cmd-tag">share</div></div>
+      <div class="cmd-row"><div class="cmd-name">skel status</div><div class="cmd-desc">One-line summary — name, last scanned, item count. Fast, no rescan. Useful in shell prompts.</div><div class="cmd-tag">info</div></div>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- COVERAGE -->
+  <section class="section reveal" id="coverage">
+    <div class="section-top">
+      <div>
+        <p class="section-eyebrow">02 · Coverage</p>
+        <h2>If it shapes how<br><span class="dim">you work, it's saved.</span></h2>
+      </div>
+      <p class="section-note">Private keys, .env files, and tokens are never read or stored.</p>
+    </div>
+    <div class="cov-grid">
+      <div class="cov-cell"><div class="cov-icon">🍺</div><div class="cov-name">Homebrew</div><div class="cov-detail">Taps, formulas, casks, App Store via mas</div></div>
+      <div class="cov-cell"><div class="cov-icon">🐚</div><div class="cov-name">Shell</div><div class="cov-detail">Zsh, Fish, Bash — configs, Oh My Zsh, Starship</div></div>
+      <div class="cov-cell"><div class="cov-icon">💻</div><div class="cov-name">Editors</div><div class="cov-detail">VS Code, Cursor, Neovim, JetBrains IDEs</div></div>
+      <div class="cov-cell"><div class="cov-icon">🔧</div><div class="cov-name">Git</div><div class="cov-detail">.gitconfig, global .gitignore, user identity</div></div>
+      <div class="cov-cell"><div class="cov-icon">🌐</div><div class="cov-name">Languages</div><div class="cov-detail">Node, Python, Go, Ruby, Rust, Java, PHP</div></div>
+      <div class="cov-cell"><div class="cov-icon">📦</div><div class="cov-name">Packages</div><div class="cov-detail">npm, pip, cargo, gems, pnpm, composer</div></div>
+      <div class="cov-cell"><div class="cov-icon">⚙️</div><div class="cov-name">Configs</div><div class="cov-detail">All of ~/.config, auto-discovered</div></div>
+      <div class="cov-cell"><div class="cov-icon">🖥️</div><div class="cov-name">System</div><div class="cov-detail">Dock, Finder, keyboard, trackpad prefs</div></div>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- SHARE -->
+  <section class="section reveal">
+    <div class="section-top">
+      <div>
+        <p class="section-eyebrow">03 · Share</p>
+        <h2>Your setup.<br><span class="dim">One link away.</span></h2>
+      </div>
+      <p class="section-note">Clone any public profile without authentication.</p>
+    </div>
+    <div class="share-grid">
+      <div class="share-card">
+        <p class="share-label">Publish to Gist</p>
+        <p class="share-cmd">$ skel publish my-setup</p>
+        <p class="share-desc">Pushes your profile to a GitHub Gist. PII is auto-redacted before upload — git identity, hostname, SSH key comments.</p>
+      </div>
+      <div class="share-card">
+        <p class="share-label">Clone from Gist</p>
+        <p class="share-cmd">$ skel clone github:user/abc123</p>
+        <p class="share-desc">Pull any public Gist profile in one command. Review it with skel show before restoring to a new machine.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <footer>
+    <a href="#" class="footer-logo">
+      <div class="logo-mark">sk</div>
+      skel
+    </a>
+    <span class="footer-built">Go · Bubble Tea · Lip Gloss · Cobra</span>
+    <div class="footer-links">
+      <a href="https://github.com/kasperbasse/skel" target="_blank">GitHub</a>
+      <a href="https://github.com/kasperbasse/skel/issues" target="_blank">Issues</a>
+      <a href="https://github.com/kasperbasse/skel/releases" target="_blank">Releases</a>
+      <a href="https://github.com/kasperbasse/skel/blob/main/LICENSE" target="_blank">MIT</a>
+    </div>
+  </footer>
+
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const saved = localStorage.getItem('skel-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initial = saved || (prefersDark ? 'dark' : 'light');
+    html.setAttribute('data-theme', initial);
+    updateIcon(initial);
+
+    function toggleTheme() {
+      const cur = html.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('skel-theme', next);
+      updateIcon(next);
+    }
+
+    function updateIcon(theme) {
+      const icon = document.getElementById('theme-icon');
+      if (theme === 'dark') {
+        icon.innerHTML = '<path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>';
+      } else {
+        icon.innerHTML = '<path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>';
+      }
+    }
+
+    // Copy
+    function copyInstall() {
+      navigator.clipboard.writeText('brew tap kasperbasse/tap && brew install skel').catch(() => {});
+    }
+
+    // Stars
+    fetch('https://api.github.com/repos/kasperbasse/skel')
+      .then(r => r.json())
+      .then(d => {
+        if (d.stargazers_count !== undefined)
+          document.getElementById('star-count').textContent = '★ ' + d.stargazers_count;
+      }).catch(() => {});
+
+    // Scroll reveal
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>
