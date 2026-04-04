@@ -111,12 +111,16 @@
           align-items: center;
           gap: 8px;
           text-decoration: none;
-          color: var(--ink);
+          color: var(--muted);
           font-family: var(--mono);
           font-size: 14px;
-          font-weight: 500;
+          font-weight: 700;
           letter-spacing: -0.01em;
           transition: color var(--transition);
+      }
+
+      .nav-logo:hover {
+          color: var(--ink);
       }
 
       .logo-mark {
@@ -126,6 +130,7 @@
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          transition: opacity var(--transition);
       }
 
       .logo-mark svg {
@@ -185,8 +190,8 @@
       }
 
       .theme-btn {
-          width: 36px;
-          height: 36px;
+          width: 31px;
+          height: 31px;
           border-radius: var(--radius);
           border: 1px solid var(--border);
           background: var(--bg2);
@@ -327,7 +332,7 @@
           flex: 1;
           padding: 12px 14px;
           font-family: var(--mono);
-          font-size: 13px;
+          font-size: 12px;
           color: var(--code-fg);
       }
 
@@ -386,7 +391,6 @@
           }
       }
 
-      /* ── TERMINAL CARD ── */
       .term-card {
           background: var(--bg2);
           border: 1px solid var(--border);
@@ -796,7 +800,6 @@
           transition: color var(--transition);
       }
 
-      /* ── SHARE ── */
       .share-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -849,7 +852,6 @@
           transition: color var(--transition);
       }
 
-      /* ── FOOTER ── */
       footer {
           border-top: 1px solid var(--border);
           padding: 28px 32px;
@@ -891,14 +893,13 @@
       }
 
       .footer-logo .logo-mark {
-          width: 20px;
-          height: 20px;
-          transition: opacity var(--transition);
+          width: 25px;
+          height: 25px;
       }
 
       .footer-logo .logo-mark svg {
-          width: 20px;
-          height: 20px;
+          width: 25px;
+          height: 25px;
       }
 
       .footer-built {
@@ -931,7 +932,6 @@
           color: var(--ink);
       }
 
-      /* ── REVEAL ── */
       .reveal {
           opacity: 0;
           transform: translateY(12px);
@@ -994,7 +994,7 @@
   <div class="nav-left">
     <a href="#" class="nav-logo">
       <div class="logo-mark">
-        <svg width="200" height="200" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
             <path
                 d="M22 45C22 25 32 15 50 15C68 15 78 25 78 45C78 60 70 65 70 72V83C70 85 68 87 66 87H34C32 87 30 85 30 83V72C30 65 22 60 22 45Z"/>
@@ -1009,7 +1009,7 @@
       </div>
       skel
     </a>
-    <span class="nav-tag">v0.2.0 · early preview</span>
+    <span class="nav-tag" id="nav-tag-name">Version</span>
   </div>
   <div class="nav-right">
     <a href="https://github.com/kasperbasse/skel" target="_blank" class="gh-btn">
@@ -1262,7 +1262,7 @@
 <footer>
   <a href="#" class="footer-logo">
     <div class="logo-mark">
-      <svg width="200" height="200" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
           <path
               d="M22 45C22 25 32 15 50 15C68 15 78 25 78 45C78 60 70 65 70 72V83C70 85 68 87 66 87H34C32 87 30 85 30 83V72C30 65 22 60 22 45Z"/>
@@ -1320,9 +1320,21 @@
     // Stars
     fetch('https://api.github.com/repos/kasperbasse/skel')
         .then(r => r.json())
-        .then(d => {
-            if (d.stargazers_count !== undefined)
-                document.getElementById('star-count').textContent = '★ ' + d.stargazers_count;
+        .then(r => {
+            if (r.stargazers_count !== undefined) {
+                document.getElementById('star-count').textContent = '★ ' + r.stargazers_count;
+            }
+        }).catch(() => {
+    });
+
+    // Release version
+    fetch('https://api.github.com/repos/kasperbasse/skel/releases/latest')
+        .then(r => r.json())
+        .then(r => {
+            if (r.tag_name !== undefined) {
+                const cleanVersion = r.tag_name.replace('v','').replace('.','');
+                document.getElementById('nav-tag-name').textContent = r.tag_name + (cleanVersion < 100 ? ' · early preview' : '');
+            }
         }).catch(() => {
     });
 
